@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
@@ -8,152 +7,112 @@ using UnityEngine;
 public class DroneController : Agent
 {
     public float speed = 5f;
+    public Transform checkpointsContainer;
+    public List<Transform> waypoints;
+    public float proximityThreshold = 1.0f;
 
-    private Vector3 initialPosition;
-
-    private enum ACTIONS
-    {
-        LEFT = 0,
-        FORWARD = 1,
-        RIGHT = 2,
-        BACKWARD = 3,
-        UP = 4,
-        DOWN = 5
-    }
+    private int currentWaypointIndex = 0;
 
     public override void OnEpisodeBegin()
     {
-        initialPosition = new Vector3(-59.0f, 53.0f, -170.0f);
-        transform.localPosition = initialPosition;
-        Debug.Log("Helló");
+        transform.localPosition = new Vector3(-59.0f, 53.0f, -170.0f);
+
+        waypoints = new List<Transform>();
+        foreach (Transform waypoint in checkpointsContainer)
+        {
+            waypoints.Add(waypoint);
+        }
+        Debug.Log("WAYPOINTS COUNT: " + waypoints.Count);
+
+        currentWaypointIndex = 0;
+        ResetWaypoints();
     }
 
-    public override void OnActionReceived(ActionBuffers actions)
+    public override void OnActionReceived(ActionBuffers actionBuffers)
     {
-        var actionTaken = actions.DiscreteActions[0];
-        var moveDirection = Vector3.zero;
-        Debug.Log(actionTaken);
+        var continuousActions = actionBuffers.ContinuousActions;
 
-        switch (actionTaken)
+        if (continuousActions.Length >= 3)
         {
-            case (int)ACTIONS.FORWARD:
-                moveDirection = transform.forward;
-                break;
-            case (int)ACTIONS.LEFT:
-                moveDirection = -transform.right;
-                break;
-            case (int)ACTIONS.RIGHT:
-                moveDirection = transform.right;
-                break;
-            case (int)ACTIONS.BACKWARD:
-                moveDirection = -transform.forward;
-                break;
-            case (int)ACTIONS.UP:
-                moveDirection = transform.up;
-                break;
-            case (int)ACTIONS.DOWN:
-                moveDirection = -transform.up;
-                break;
-        }
+            var moveDirection = new Vector3(continuousActions[0], continuousActions[1], continuousActions[2]);
 
-        transform.Translate(moveDirection * speed * Time.fixedDeltaTime);
-
-        if (IsInAir())
-        {
-            AddReward(0.001f);
+            transform.Translate(moveDirection * speed * Time.fixedDeltaTime);
         }
         else
         {
-            AddReward(-0.05f);
-            EndEpisode(); // Azonnal befejezzük az epizódot, ha a drón leér a talajra.
+            Debug.LogError("Invalid number of continuous actions received.");
+        }
+
+        if (Vector3.Distance(transform.position, waypoints[currentWaypointIndex].position) < proximityThreshold)
+        {
+            AddReward(0.1f);
+
+            if (currentWaypointIndex >= waypoints.Count)
+            {
+                EndEpisode();
+                return;
+            }
+
+            Collider checkpointCollider = waypoints[currentWaypointIndex].GetComponent<Collider>();
+            if (checkpointCollider != null)
+            {
+                checkpointCollider.isTrigger = true;
+                AddReward(1.0f);
+                DisableColliderAtIndex(currentWaypointIndex);
+            }
+
+            Debug.Log("Current Total Reward: " + GetCumulativeReward());
+
+            ResetWaypoints();
+        }
+
+        if (StepCount % 100 == 0)
+        {
+            AddReward(-0.01f);
         }
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        sensor.AddObservation(transform.localPosition.x);
-        sensor.AddObservation(transform.localPosition.y);
-        sensor.AddObservation(transform.localPosition.z);
+        sensor.AddObservation(transform.localPosition);
+
+        float distanceToWaypoint = Vector3.Distance(transform.position, waypoints[currentWaypointIndex].position);
+        sensor.AddObservation(distanceToWaypoint);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
-        ActionSegment<int> actions = actionsOut.DiscreteActions;
-
-        var horizontal = 0;
-        var vertical = 0;
-        var ascend = 0;
-        var descend = 0;
-
-        if (Input.GetKey(KeyCode.A))
-        {
-            horizontal = -1;
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            horizontal = 1;
-        }
-
-        if (Input.GetKey(KeyCode.W))
-        {
-            vertical = 1;
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            vertical = -1;
-        }
-
-        if (Input.GetKey(KeyCode.I))
-        {
-            ascend = 1;
-        }
-        else if (Input.GetKey(KeyCode.K))
-        {
-            descend = 1;
-        }
-
-        actions[0] = GetAction(horizontal, vertical, ascend, descend);
+        // Implement Heuristic control if needed for manual testing.
     }
 
-    private int GetAction(int horizontal, int vertical, int ascend, int descend)
+    private void ResetWaypoints()
     {
-        if (horizontal == -1)
+        foreach (Transform waypoint in waypoints)
         {
-            return (int)ACTIONS.LEFT;
-        }
-        else if (horizontal == 1)
-        {
-            return (int)ACTIONS.RIGHT;
-        }
-        else if (vertical == 1)
-        {
-            return (int)ACTIONS.FORWARD;
-        }
-        else if (vertical == -1)
-        {
-            return (int)ACTIONS.BACKWARD;
-        }
-        else if (ascend == 1)
-        {
-            return (int)ACTIONS.UP;
-        }
-        else if (descend == 1)
-        {
-            return (int)ACTIONS.DOWN;
-        }
-        else
-        {
-            return (int)ACTIONS.FORWARD;
+            Collider checkpointCollider = waypoint.GetComponent<Collider>();
+            if (checkpointCollider != null)
+            {
+                checkpointCollider.isTrigger = true;
+                waypoint.gameObject.SetActive(true);
+            }
         }
     }
-
-    private bool IsInAir()
+    private void DisableColliderAtIndex(int index)
     {
-        return transform.localPosition.y > 1.0f;
+        if (index >= 0 && index < waypoints.Count)
+        {
+            Collider checkpointCollider = waypoints[index].GetComponent<Collider>();
+            if (checkpointCollider != null)
+            {
+                checkpointCollider.gameObject.SetActive(false);
+            }
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("Collision detected: " + collision.collider.tag);
+
         if (collision.collider.CompareTag("Wall"))
         {
             AddReward(-1);
@@ -164,8 +123,19 @@ public class DroneController : Agent
             AddReward(-0.5f);
             EndEpisode();
         }
+        else if (collision.collider.CompareTag("Vehicle"))
+        {
+            AddReward(-0.5f);
+            EndEpisode();
+        }
+        else if (collision.collider.CompareTag("Building"))
+        {
+            AddReward(-0.5f);
+            EndEpisode();
+        }
         else if (collision.collider.CompareTag("Checkpoint"))
         {
+            currentWaypointIndex++;
             AddReward(1.0f);
         }
     }
