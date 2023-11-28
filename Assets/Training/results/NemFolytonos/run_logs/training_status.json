@@ -1,0 +1,29 @@
+{
+    "DroneBehavior": {
+        "checkpoints": [
+            {
+                "steps": 6365,
+                "file_path": "results\\NemFolytonos\\DroneBehavior\\DroneBehavior-6365.onnx",
+                "reward": -3.4668749570846558,
+                "creation_time": 1699777913.482593,
+                "auxillary_file_paths": [
+                    "results\\NemFolytonos\\DroneBehavior\\DroneBehavior-6365.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 6365,
+            "file_path": "results\\NemFolytonos\\DroneBehavior.onnx",
+            "reward": -3.4668749570846558,
+            "creation_time": 1699777913.482593,
+            "auxillary_file_paths": [
+                "results\\NemFolytonos\\DroneBehavior\\DroneBehavior-6365.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.28.0",
+        "torch_version": "1.7.1+cu110"
+    }
+}
