@@ -135,8 +135,30 @@ public class DroneController : Agent
         }
         else if (collision.collider.CompareTag("Checkpoint"))
         {
-            currentWaypointIndex++;
-            AddReward(1.0f);
+            int nextCheckpointIndex = currentWaypointIndex + 1;
+
+            // Ellenõrizzük, hogy a következõ checkpoint indexe a meglévõ checkpointok között van-e
+            if (currentWaypointIndex < waypoints.Count - 1)
+            {
+                // A kód itt marad változatlan
+                if (currentWaypointIndex == waypoints.IndexOf(collision.transform))
+                {
+                    AddReward(1.0f);
+                    currentWaypointIndex++;
+
+                    Debug.Log("Checkpoint passed: " + collision.collider.name);
+
+                    for (int i = 0; i < currentWaypointIndex; i++)
+                    {
+                        DisableColliderAtIndex(i);
+                    }
+                }
+            }
+            else
+            {
+                // Ha nincs több checkpoint, akkor befejezzük az epizódot
+                EndEpisode();
+            }
         }
     }
 }
