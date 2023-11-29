@@ -2,22 +2,22 @@
     "DroneBehavior": {
         "checkpoints": [
             {
-                "steps": 102222,
-                "file_path": "results\\Test3\\DroneBehavior\\DroneBehavior-102222.onnx",
-                "reward": 165.06000999653978,
-                "creation_time": 1701256015.367444,
+                "steps": 252391,
+                "file_path": "results\\Test3\\DroneBehavior\\DroneBehavior-252391.onnx",
+                "reward": null,
+                "creation_time": 1701285124.290492,
                 "auxillary_file_paths": [
-                    "results\\Test3\\DroneBehavior\\DroneBehavior-102222.pt"
+                    "results\\Test3\\DroneBehavior\\DroneBehavior-252391.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 102222,
+            "steps": 252391,
             "file_path": "results\\Test3\\DroneBehavior.onnx",
-            "reward": 165.06000999653978,
-            "creation_time": 1701256015.367444,
+            "reward": null,
+            "creation_time": 1701285124.290492,
             "auxillary_file_paths": [
-                "results\\Test3\\DroneBehavior\\DroneBehavior-102222.pt"
+                "results\\Test3\\DroneBehavior\\DroneBehavior-252391.pt"
             ]
         }
     },

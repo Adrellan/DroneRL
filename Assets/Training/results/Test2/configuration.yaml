@@ -3,8 +3,8 @@ behaviors:
   DroneBehavior:
     trainer_type: ppo
     hyperparameters:
-      batch_size: 512
-      buffer_size: 5000
+      batch_size: 1024
+      buffer_size: 10000
       learning_rate: 0.0003
       beta: 0.005
       epsilon: 0.2
@@ -38,7 +38,7 @@ behaviors:
     checkpoint_interval: 500000
     max_steps: 1000000
     time_horizon: 256
-    summary_freq: 500
+    summary_freq: 1000
     threaded: true
     self_play: null
     behavioral_cloning: null
