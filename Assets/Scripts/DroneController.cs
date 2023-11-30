@@ -4,6 +4,7 @@ using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
 
+
 public class DroneController : Agent
 {
     private Rigidbody rb;  // Rigidbody a fizikai mozgásért
@@ -87,6 +88,7 @@ public class DroneController : Agent
 
         // Jutalmak és büntetések
         float reward = CalculateReward();
+        AddReward(-0.001f);
         AddReward(reward);
 
         // Debug információk kiírása
@@ -117,12 +119,16 @@ public class DroneController : Agent
                 if (goHit != null && goHit.CompareTag("Checkpoint") && goHit != lastVisitedCheckpoint)
                 {
                     // Felvette a checkpointot, jutalmazható és ne vegye többé számításba
-                    float reward = 1.0f;  // Jutalom beállítása, példa érték
+                    float reward = 2.0f;  // Jutalom beállítása, példa érték
                     AddReward(reward);
                     lastVisitedCheckpoint = goHit;
                 }
-
-                // A további érzékelési adatok feldolgozása...
+                else if (goHit != null && (goHit.CompareTag("Wall") || goHit.CompareTag("Building") || goHit.CompareTag("Vehicle") || goHit.CompareTag("Ground")))
+                {
+                    // Ha az objektum egy akadály, büntetést adunk hozzá
+                    float penalty = -0.01f;  // Büntetés beállítása, példa érték
+                    AddReward(penalty);
+                }
             }
         }
     }
@@ -181,7 +187,7 @@ public class DroneController : Agent
             // Ellenõrizzük, hogy ez a checkpoint már jutalmazva lett-e az aktuális epizód során
             if (!rewardedCheckpoints.Contains(collidedCheckpoint))
             {
-                reward += 5.0f;
+                reward += 2.5f;
                 Debug.Log("JUTALOMPONTOK - CHECKPOINT: " + GetCumulativeReward());
                 Debug.Log($"TÁVOLSÁG A KÖVETKEZÕ CHECKPOINTTÓL: {Vector3.Distance(transform.position, nearestCheckpoint.transform.position)}");
                 Debug.Log($"KÖVETKEZÕ CHECKPOINT POZI: {nearestCheckpoint.transform.position}");
@@ -195,7 +201,7 @@ public class DroneController : Agent
         }
 
         // Kevesebb büntetés az idõ múlásával
-        reward -= Time.fixedDeltaTime * 0.5f;  // Példa érték, állítsd be aszerint, amilyen nagyságrendben büntetni szeretnéd
+        // reward -= Time.fixedDeltaTime * 0.5f;  // Példa érték, állítsd be aszerint, amilyen nagyságrendben büntetni szeretnéd
 
         return reward;
     }

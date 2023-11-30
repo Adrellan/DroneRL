@@ -1,0 +1,65 @@
+{
+    "DroneBehavior": {
+        "checkpoints": [
+            {
+                "steps": 8499769,
+                "file_path": "results\\winner winner chicken dinner\\DroneBehavior\\DroneBehavior-8499769.onnx",
+                "reward": -0.19924969086423516,
+                "creation_time": 1701319425.5487466,
+                "auxillary_file_paths": [
+                    "results\\winner winner chicken dinner\\DroneBehavior\\DroneBehavior-8499769.pt"
+                ]
+            },
+            {
+                "steps": 8999978,
+                "file_path": "results\\winner winner chicken dinner\\DroneBehavior\\DroneBehavior-8999978.onnx",
+                "reward": -0.750832898542285,
+                "creation_time": 1701320320.0103703,
+                "auxillary_file_paths": [
+                    "results\\winner winner chicken dinner\\DroneBehavior\\DroneBehavior-8999978.pt"
+                ]
+            },
+            {
+                "steps": 9499880,
+                "file_path": "results\\winner winner chicken dinner\\DroneBehavior\\DroneBehavior-9499880.onnx",
+                "reward": -0.2295550937221075,
+                "creation_time": 1701321214.355456,
+                "auxillary_file_paths": [
+                    "results\\winner winner chicken dinner\\DroneBehavior\\DroneBehavior-9499880.pt"
+                ]
+            },
+            {
+                "steps": 9999765,
+                "file_path": "results\\winner winner chicken dinner\\DroneBehavior\\DroneBehavior-9999765.onnx",
+                "reward": -0.12118131764741107,
+                "creation_time": 1701322106.2742114,
+                "auxillary_file_paths": [
+                    "results\\winner winner chicken dinner\\DroneBehavior\\DroneBehavior-9999765.pt"
+                ]
+            },
+            {
+                "steps": 10000021,
+                "file_path": "results\\winner winner chicken dinner\\DroneBehavior\\DroneBehavior-10000021.onnx",
+                "reward": -0.12118131764741107,
+                "creation_time": 1701322106.3881042,
+                "auxillary_file_paths": [
+                    "results\\winner winner chicken dinner\\DroneBehavior\\DroneBehavior-10000021.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 10000021,
+            "file_path": "results\\winner winner chicken dinner\\DroneBehavior.onnx",
+            "reward": -0.12118131764741107,
+            "creation_time": 1701322106.3881042,
+            "auxillary_file_paths": [
+                "results\\winner winner chicken dinner\\DroneBehavior\\DroneBehavior-10000021.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.28.0",
+        "torch_version": "1.7.1+cu110"
+    }
+}
