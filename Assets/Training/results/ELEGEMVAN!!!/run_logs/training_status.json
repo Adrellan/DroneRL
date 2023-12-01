@@ -1,0 +1,38 @@
+{
+    "DroneBehavior": {
+        "checkpoints": [
+            {
+                "steps": 499999,
+                "file_path": "results\\ELEGEMVAN!!!\\DroneBehavior\\DroneBehavior-499999.onnx",
+                "reward": 572.4122700822463,
+                "creation_time": 1701380939.068175,
+                "auxillary_file_paths": [
+                    "results\\ELEGEMVAN!!!\\DroneBehavior\\DroneBehavior-499999.pt"
+                ]
+            },
+            {
+                "steps": 770356,
+                "file_path": "results\\ELEGEMVAN!!!\\DroneBehavior\\DroneBehavior-770356.onnx",
+                "reward": 1155.990225558795,
+                "creation_time": 1701381566.2328973,
+                "auxillary_file_paths": [
+                    "results\\ELEGEMVAN!!!\\DroneBehavior\\DroneBehavior-770356.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 770356,
+            "file_path": "results\\ELEGEMVAN!!!\\DroneBehavior.onnx",
+            "reward": 1155.990225558795,
+            "creation_time": 1701381566.2328973,
+            "auxillary_file_paths": [
+                "results\\ELEGEMVAN!!!\\DroneBehavior\\DroneBehavior-770356.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.28.0",
+        "torch_version": "1.7.1+cu110"
+    }
+}

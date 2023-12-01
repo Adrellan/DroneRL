@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
@@ -7,29 +7,19 @@ using UnityEngine;
 
 public class DroneController : Agent
 {
-    private Rigidbody rb;  // Rigidbody a fizikai mozgásért
-
-    // Az érzékelõk
+    private Rigidbody rb;  // Rigidbody a fizikai mozgÃ¡sÃ©rt
     private List<RayPerceptionSensorComponent3D> rayPerceptionSensors = new List<RayPerceptionSensorComponent3D>();
-
-    // A drón által elérhetõ checkpointok
     private List<GameObject> checkpoints = new List<GameObject>();
-
-    // Az aktuális epizód során már jutalmazott checkpointok
     private HashSet<GameObject> rewardedCheckpoints = new HashSet<GameObject>();
-
     private Vector3 lastCheckpointPosition;
 
     public float maxDistanceToLastCheckpoint = 100f;
-
     private GameObject nearestCheckpoint;
-
-    public Material highlightMaterial;
-
     private GameObject lastVisitedCheckpoint;
-
     private VectorSensor vectorSensor;
-
+    private float currentCheckpointReward = 1.0f;
+    private float checkpointRewardIncrease = 0.1f;
+    private float timeSinceLastCheckpoint;
 
     private void Start()
     {
@@ -37,6 +27,20 @@ public class DroneController : Agent
         rayPerceptionSensors.AddRange(GetComponents<RayPerceptionSensorComponent3D>());
         checkpoints.AddRange(GameObject.FindGameObjectsWithTag("Checkpoint"));
         nearestCheckpoint = FindNearestCheckpoint();
+        timeSinceLastCheckpoint = 0f;
+    }
+
+    public override void OnEpisodeBegin()
+    {
+        transform.localPosition = new Vector3(-59.0f, 53.0f, -170.0f);
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        lastVisitedCheckpoint = null;
+        rewardedCheckpoints.Clear();
+        nearestCheckpoint = FindNearestCheckpoint();
+
+        timeSinceLastCheckpoint = 0f;
     }
 
     private GameObject FindNearestCheckpoint()
@@ -46,7 +50,6 @@ public class DroneController : Agent
 
         foreach (var checkpoint in checkpoints)
         {
-            // Ellenõrizd, hogy ez a checkpoint még NEM lett felvéve az aktuális epizódban
             if (!rewardedCheckpoints.Contains(checkpoint))
             {
                 float distance = Vector3.Distance(transform.position, checkpoint.transform.position);
@@ -61,44 +64,21 @@ public class DroneController : Agent
         return nearest;
     }
 
-
-    //private void HighlightNearestCheckpoint()
-    //{
-    //    if (highlightMaterial != null && nearestCheckpoint != null)
-    //    {
-    //        // Az anyag cseréje a kijelölt anyagra
-    //        Renderer checkpointRenderer = nearestCheckpoint.GetComponent<Renderer>();
-    //        checkpointRenderer.material = highlightMaterial;
-    //    }
-    //}
-
     public override void OnActionReceived(ActionBuffers actions)
     {
-        // Frissítsük a legközelebbi checkpointot
         nearestCheckpoint = FindNearestCheckpoint();
-
-        // Kinyerjük az continuous cselekvéseket
         var continuousActions = actions.ContinuousActions;
-
-        // A continuous cselekvések értékeit felhasználva változtatjuk a drón pozícióját
         Vector3 moveDirection = new Vector3(continuousActions[0], continuousActions[1], continuousActions[2]);
-        rb.AddForce(moveDirection * 10f);
+        rb.transform.Translate(moveDirection * 5f);
 
         Distance();
-
-        // Jutalmak és büntetések
         float reward = CalculateReward();
         AddReward(-0.001f);
         AddReward(reward);
 
-        // Debug információk kiírása
-        // Debug.Log($"Drón pozíció: {transform.position}");
-        // Debug.Log($"Következõ checkpoint pozíció: {nearestCheckpoint.transform.position}");
-
+        timeSinceLastCheckpoint += Time.fixedDeltaTime;
         CheckRayCasts();
     }
-
-
 
     private void CheckRayCasts()
     {
@@ -108,26 +88,19 @@ public class DroneController : Agent
 
             int lengthOfRayOutputs = rayOutputs.Length;
 
-            // Alternating Ray Order: it gives an order of
-            // (0, -delta, delta, -2delta, 2delta, ..., -ndelta, ndelta)
-            // index 0 indicates the center of raycasts
             for (int i = 0; i < lengthOfRayOutputs; i++)
             {
                 GameObject goHit = rayOutputs[i].HitGameObject;
 
-                // Ha a látott objektum egy checkpoint, és még nem volt felvéve ebben az epizódban
                 if (goHit != null && goHit.CompareTag("Checkpoint") && goHit != lastVisitedCheckpoint)
                 {
-                    // Felvette a checkpointot, jutalmazható és ne vegye többé számításba
-                    float reward = 2.0f;  // Jutalom beállítása, példa érték
-                    AddReward(reward);
+                    //AddReward(0.005f);
                     lastVisitedCheckpoint = goHit;
+                    timeSinceLastCheckpoint = 0f;  // NullÃ¡zzuk az idÅ‘t, mert Ãºj checkpoint felvÃ©tele tÃ¶rtÃ©nt
                 }
                 else if (goHit != null && (goHit.CompareTag("Wall") || goHit.CompareTag("Building") || goHit.CompareTag("Vehicle") || goHit.CompareTag("Ground")))
                 {
-                    // Ha az objektum egy akadály, büntetést adunk hozzá
-                    float penalty = -0.01f;  // Büntetés beállítása, példa érték
-                    AddReward(penalty);
+                    AddReward(-0.01f);
                 }
             }
         }
@@ -136,17 +109,14 @@ public class DroneController : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // Minden érzékelõbõl származó adatok összegyûjtése
         foreach (var rayPerceptionSensor in rayPerceptionSensors)
         {
             var rayOutputs = RayPerceptionSensor.Perceive(rayPerceptionSensor.GetRayPerceptionInput()).RayOutputs;
             foreach (var output in rayOutputs)
             {
-                // Az érzékelõ által összegyûjtött adatok hozzáadása a megfigyeléshez
                 sensor.AddObservation(output.HitFraction);
             }
         }
-        // Egyéb megfigyelések (ha szükséges)
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -161,21 +131,21 @@ public class DroneController : Agent
     {
         float reward = 0f;
 
-        // Ellenõrizzük, hogy a drónnak ütközik-e valamilyen objektummal
+        // EllenÃµrizzÃ¼k, hogy a drÃ³nnak Ã¼tkÃ¶zik-e valamilyen objektummal
         bool isCollidingWithObstacle = IsCollidingWithObstacle();
         if (isCollidingWithObstacle)
         {
-            // Ha nekimegy valamilyen akadálynak, akkor nagyobb büntetést kap és az epizód véget ér
+            // Ha nekimegy valamilyen akadÃ¡lynak, akkor nagyobb bÃ¼ntetÃ©st kap Ã©s az epizÃ³d vÃ©get Ã©r
             reward -= 1.0f;
-            Debug.Log("Jutalompontok - ütközött: " + GetCumulativeReward());
+            Debug.Log("Jutalompontok - Ã¼tkÃ¶zÃ¶tt: " + GetCumulativeReward());
             EndEpisode();
         }
         else
         {
-            // Ha nem ütközik, akkor jutalmat kap, ha levegõben van és mozog
+            // Ha nem Ã¼tkÃ¶zik, akkor jutalmat kap, ha levegÃµben van Ã©s mozog
             if (!IsGrounded() && rb.velocity.magnitude > 0.1f)
             {
-                // Most nem kap jutalmat a repülésért
+                // Most nem kap jutalmat a repÃ¼lÃ©sÃ©rt
                 // reward += 0.01f;
             }
         }
@@ -184,24 +154,22 @@ public class DroneController : Agent
         {
             GameObject collidedCheckpoint = GetCollidedCheckpoint();
 
-            // Ellenõrizzük, hogy ez a checkpoint már jutalmazva lett-e az aktuális epizód során
             if (!rewardedCheckpoints.Contains(collidedCheckpoint))
             {
-                reward += 2.5f;
+                reward += currentCheckpointReward;
                 Debug.Log("JUTALOMPONTOK - CHECKPOINT: " + GetCumulativeReward());
-                Debug.Log($"TÁVOLSÁG A KÖVETKEZÕ CHECKPOINTTÓL: {Vector3.Distance(transform.position, nearestCheckpoint.transform.position)}");
-                Debug.Log($"KÖVETKEZÕ CHECKPOINT POZI: {nearestCheckpoint.transform.position}");
+                Debug.Log($"TÃVOLSÃG A KÃ–VETKEZÅ CHECKPOINTTÃ“L: {Vector3.Distance(transform.position, nearestCheckpoint.transform.position)}");
 
                 rewardedCheckpoints.Add(collidedCheckpoint);
 
-                // Kiírjuk a legközelebbi checkpointot
                 nearestCheckpoint = FindNearestCheckpoint();
-                Debug.Log("Legközelebbi checkpoint most: " + nearestCheckpoint.name);
+                Debug.Log("KÃ–VETKEZÅ CHECKPOINT: " + nearestCheckpoint.name);
+
+                currentCheckpointReward += checkpointRewardIncrease;
             }
         }
 
-        // Kevesebb büntetés az idõ múlásával
-        // reward -= Time.fixedDeltaTime * 0.5f;  // Példa érték, állítsd be aszerint, amilyen nagyságrendben büntetni szeretnéd
+        reward -= timeSinceLastCheckpoint >= 5f ? 0.1f : 0f;
 
         return reward;
     }
@@ -211,8 +179,9 @@ public class DroneController : Agent
         float distanceToNextCheckpoint = Vector3.Distance(transform.position, nearestCheckpoint.transform.position);
         if (distanceToNextCheckpoint > maxDistanceToLastCheckpoint)
         {
-            Debug.Log("A következõ checkpointtól túl messzire ment a drón. Epizód vége.");
+            Debug.Log("A kÃ¶vetkezÃµ checkpointtÃ³l tÃºl messzire ment a drÃ³n. EpizÃ³d vÃ©ge.");
             Debug.Log("DISTANCE!!!!" + distanceToNextCheckpoint + "MAXDISTANCE: " + maxDistanceToLastCheckpoint);
+            AddReward(-0.5f);
             EndEpisode();
         }
     }
@@ -220,7 +189,6 @@ public class DroneController : Agent
 
     private bool IsCollidingWithObstacle()
     {
-        // Ellenõrizzük, hogy a drónnak ütközik-e olyan objektummal, amelynek a tag-jei: "Wall", "Building", "Vehicle", "Ground"
         Collider[] colliders = Physics.OverlapSphere(transform.position, 1f);
         foreach (var collider in colliders)
         {
@@ -235,7 +203,6 @@ public class DroneController : Agent
 
     private bool IsCollidingWithCheckpoint()
     {
-        // Ellenõrizzük, hogy a drónnak ütközik-e egy "Checkpoint" objektummal
         Collider[] colliders = Physics.OverlapSphere(transform.position, 1f);
         foreach (var collider in colliders)
         {
@@ -250,7 +217,6 @@ public class DroneController : Agent
 
     private GameObject GetCollidedCheckpoint()
     {
-        // Ellenõrizzük, hogy a drónnak ütközik-e egy "Checkpoint" objektummal, és visszaadjuk azt
         Collider[] colliders = Physics.OverlapSphere(transform.position, 1f);
         foreach (var collider in colliders)
         {
@@ -265,30 +231,7 @@ public class DroneController : Agent
 
     private bool IsGrounded()
     {
-        // Ellenõrizzük, hogy a drón a talajon van-e
         float distanceToGround = 0.1f;
         return Physics.Raycast(transform.position, Vector3.down, distanceToGround + 0.1f);
-    }
-
-    //private bool IsOutOfBounds()
-    //{
-    //    // Példa: Ha a drón túl messze van a középponttól, akkor kiesett a területrõl
-    //    return Vector3.Distance(transform.position, Vector3.zero) > 40f;
-    //}
-
-    public override void OnEpisodeBegin()
-    {
-        // Az epizód kezdetekor végrehajtandó inicializáció (ha szükséges)
-        transform.localPosition = new Vector3(-59.0f, 53.0f, -170.0f);
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-
-        lastVisitedCheckpoint = null;
-
-        // Az aktuális epizód során már jutalmazott checkpointokat ürítjük
-        rewardedCheckpoints.Clear();
-
-        nearestCheckpoint = FindNearestCheckpoint();
-        Debug.Log("Legközelebbi checkpoint az epizód kezdetén: " + nearestCheckpoint.name);
     }
 }

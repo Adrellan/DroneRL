@@ -1,0 +1,29 @@
+{
+    "DroneBehavior": {
+        "checkpoints": [
+            {
+                "steps": 33882,
+                "file_path": "results\\drone spar budget2\\DroneBehavior\\DroneBehavior-33882.onnx",
+                "reward": -37.00100088119507,
+                "creation_time": 1701342139.704326,
+                "auxillary_file_paths": [
+                    "results\\drone spar budget2\\DroneBehavior\\DroneBehavior-33882.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 33882,
+            "file_path": "results\\drone spar budget2\\DroneBehavior.onnx",
+            "reward": -37.00100088119507,
+            "creation_time": 1701342139.704326,
+            "auxillary_file_paths": [
+                "results\\drone spar budget2\\DroneBehavior\\DroneBehavior-33882.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.28.0",
+        "torch_version": "1.7.1+cu110"
+    }
+}

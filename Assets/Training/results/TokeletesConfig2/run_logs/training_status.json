@@ -1,0 +1,38 @@
+{
+    "DroneBehavior": {
+        "checkpoints": [
+            {
+                "steps": 499924,
+                "file_path": "results\\TokeletesConfig2\\DroneBehavior\\DroneBehavior-499924.onnx",
+                "reward": 4.300944873842142,
+                "creation_time": 1701379052.2558074,
+                "auxillary_file_paths": [
+                    "results\\TokeletesConfig2\\DroneBehavior\\DroneBehavior-499924.pt"
+                ]
+            },
+            {
+                "steps": 518435,
+                "file_path": "results\\TokeletesConfig2\\DroneBehavior\\DroneBehavior-518435.onnx",
+                "reward": 4.331421264885149,
+                "creation_time": 1701379151.7610939,
+                "auxillary_file_paths": [
+                    "results\\TokeletesConfig2\\DroneBehavior\\DroneBehavior-518435.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 518435,
+            "file_path": "results\\TokeletesConfig2\\DroneBehavior.onnx",
+            "reward": 4.331421264885149,
+            "creation_time": 1701379151.7610939,
+            "auxillary_file_paths": [
+                "results\\TokeletesConfig2\\DroneBehavior\\DroneBehavior-518435.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.28.0",
+        "torch_version": "1.7.1+cu110"
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "DroneBehavior": {
+        "checkpoints": [
+            {
+                "steps": 77549,
+                "file_path": "results\\nem \u00e9rtem mi\u00e9rt fagysz ki pedig nem is \u00edrtam \u00e1t semmi olyat\\DroneBehavior\\DroneBehavior-77549.onnx",
+                "reward": -16.08099938929081,
+                "creation_time": 1701342518.9000187,
+                "auxillary_file_paths": [
+                    "results\\nem \u00e9rtem mi\u00e9rt fagysz ki pedig nem is \u00edrtam \u00e1t semmi olyat\\DroneBehavior\\DroneBehavior-77549.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 77549,
+            "file_path": "results\\nem \u00e9rtem mi\u00e9rt fagysz ki pedig nem is \u00edrtam \u00e1t semmi olyat\\DroneBehavior.onnx",
+            "reward": -16.08099938929081,
+            "creation_time": 1701342518.9000187,
+            "auxillary_file_paths": [
+                "results\\nem \u00e9rtem mi\u00e9rt fagysz ki pedig nem is \u00edrtam \u00e1t semmi olyat\\DroneBehavior\\DroneBehavior-77549.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.28.0",
+        "torch_version": "1.7.1+cu110"
+    }
+}
