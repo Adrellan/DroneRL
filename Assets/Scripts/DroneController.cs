@@ -28,6 +28,8 @@ public class DroneController : Agent
         checkpoints.AddRange(GameObject.FindGameObjectsWithTag("Checkpoint"));
         nearestCheckpoint = FindNearestCheckpoint();
         timeSinceLastCheckpoint = 0f;
+        InvokeRepeating("DisplayPoints", 0f, 2f);
+
     }
 
     public override void OnEpisodeBegin()
@@ -41,6 +43,11 @@ public class DroneController : Agent
         nearestCheckpoint = FindNearestCheckpoint();
 
         timeSinceLastCheckpoint = 0f;
+    }
+
+    private void DisplayPoints()
+    {
+        Debug.Log($"Drone Points: {GetCumulativeReward()}");
     }
 
     private GameObject FindNearestCheckpoint()
@@ -92,20 +99,32 @@ public class DroneController : Agent
             {
                 GameObject goHit = rayOutputs[i].HitGameObject;
 
-                if (goHit != null && goHit.CompareTag("Checkpoint") && goHit != lastVisitedCheckpoint)
+                if (goHit != null)
                 {
-                    //AddReward(0.005f);
-                    lastVisitedCheckpoint = goHit;
-                    timeSinceLastCheckpoint = 0f;  // Nullázzuk az időt, mert új checkpoint felvétele történt
-                }
-                else if (goHit != null && (goHit.CompareTag("Wall") || goHit.CompareTag("Building") || goHit.CompareTag("Vehicle") || goHit.CompareTag("Ground")))
-                {
-                    AddReward(-0.01f);
+                    if (goHit.CompareTag("Checkpoint") && goHit != lastVisitedCheckpoint && !rewardedCheckpoints.Contains(goHit))
+                    {
+                        if (IsNearestCheckpoint(goHit))
+                        {
+                            lastVisitedCheckpoint = goHit;
+                            timeSinceLastCheckpoint = 0f;
+                            AddReward(0.01f);
+                        }
+                    }
+                    else if (goHit.CompareTag("Wall") || goHit.CompareTag("Building") || goHit.CompareTag("Vehicle") || goHit.CompareTag("Ground"))
+                    {
+                        AddReward(-0.01f);
+                    }
                 }
             }
         }
     }
 
+    private bool IsNearestCheckpoint(GameObject checkpoint)
+    {
+        float distanceToCheckpoint = Vector3.Distance(transform.position, checkpoint.transform.position);
+        float distanceToNearest = Vector3.Distance(transform.position, nearestCheckpoint.transform.position);
+        return distanceToCheckpoint < distanceToNearest;
+    }
 
     public override void CollectObservations(VectorSensor sensor)
     {
@@ -181,7 +200,7 @@ public class DroneController : Agent
         {
             Debug.Log("A következõ checkpointtól túl messzire ment a drón. Epizód vége.");
             Debug.Log("DISTANCE!!!!" + distanceToNextCheckpoint + "MAXDISTANCE: " + maxDistanceToLastCheckpoint);
-            AddReward(-0.5f);
+            AddReward(-0.75f);
             EndEpisode();
         }
     }

@@ -1,0 +1,65 @@
+{
+    "DroneBehavior": {
+        "checkpoints": [
+            {
+                "steps": 1999959,
+                "file_path": "results\\finomhangolas\\DroneBehavior\\DroneBehavior-1999959.onnx",
+                "reward": 34858.39663636451,
+                "creation_time": 1701513053.881191,
+                "auxillary_file_paths": [
+                    "results\\finomhangolas\\DroneBehavior\\DroneBehavior-1999959.pt"
+                ]
+            },
+            {
+                "steps": 2499916,
+                "file_path": "results\\finomhangolas\\DroneBehavior\\DroneBehavior-2499916.onnx",
+                "reward": 56308.124254097966,
+                "creation_time": 1701514092.0407171,
+                "auxillary_file_paths": [
+                    "results\\finomhangolas\\DroneBehavior\\DroneBehavior-2499916.pt"
+                ]
+            },
+            {
+                "steps": 2999908,
+                "file_path": "results\\finomhangolas\\DroneBehavior\\DroneBehavior-2999908.onnx",
+                "reward": 75700.06697112438,
+                "creation_time": 1701515116.6065397,
+                "auxillary_file_paths": [
+                    "results\\finomhangolas\\DroneBehavior\\DroneBehavior-2999908.pt"
+                ]
+            },
+            {
+                "steps": 3499871,
+                "file_path": "results\\finomhangolas\\DroneBehavior\\DroneBehavior-3499871.onnx",
+                "reward": 93023.49744022253,
+                "creation_time": 1701516165.769025,
+                "auxillary_file_paths": [
+                    "results\\finomhangolas\\DroneBehavior\\DroneBehavior-3499871.pt"
+                ]
+            },
+            {
+                "steps": 3916489,
+                "file_path": "results\\finomhangolas\\DroneBehavior\\DroneBehavior-3916489.onnx",
+                "reward": 106832.53265358337,
+                "creation_time": 1701517096.8285708,
+                "auxillary_file_paths": [
+                    "results\\finomhangolas\\DroneBehavior\\DroneBehavior-3916489.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 3916489,
+            "file_path": "results\\finomhangolas\\DroneBehavior.onnx",
+            "reward": 106832.53265358337,
+            "creation_time": 1701517096.8285708,
+            "auxillary_file_paths": [
+                "results\\finomhangolas\\DroneBehavior\\DroneBehavior-3916489.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.28.0",
+        "torch_version": "1.7.1+cu110"
+    }
+}
